@@ -1,0 +1,45 @@
+- [ ] [[User Interface]]
+	- [ ] Mogućnost uploada Excel file-a
+		- [x] Button s kojim se pretražuje lokacija 
+		- [x] Button s kojim se loada excel file
+    		- [ ] Sprema se u bazu podataka koja sadrži podatke svih prijašnjih fileova
+        		- [ ] Od zadnjeg datuma u u bazi podataka
+		- [ ] Button s kojim je moguće pristupiti prošlim podatcima
+		- [ ] Preview podataka
+	
+	- [ ] Mogućnost izbora vrste izvještaja i stavki u izvještaju
+		- [ ] Checkbox pomoću kojih se određuje što će pisati u izvještaju
+		- [ ] Vrste izvještaja
+			- [ ] Usporedba osoba
+				- [ ] Najbolji radnici 
+				- [ ] Najgori radnici
+				- [ ] Standardna devijacija
+			- [ ] Usporedba procesa 
+				- [ ] Potrošeni radni sati
+				- [ ] Dobivene količine
+			- [ ] Usporedba razdoblja
+			- [ ] Koliko je puta neki radnik bio na određenom procesu
+- [ ] Obrada podataka
+	- [ ] Obrađuje i uređuje podatke iz excel file-a
+		- [ ] Mogućnost editanja Excel file-a
+		- [ ] Prebacuje podatke u SQL bazu podataka
+			- [ ] Sprema podatke prema radnicima
+			- [ ] Sprema podatke prema procesima
+			- [ ] Mogućnost pristupa spremljenim podatcima
+		- [ ] Prosjeci po mjesecima
+		- [x] Prosjeci po radniku
+		- [ ] Prosjeci po procesu
+		- [ ] Napredak radnika
+		- [ ] Generiranje grafova i tablica
+- [ ] Generiranje izvještaja
+	- [ ] Na osnovu podataka generira se standardizirani izvještaj
+		- [ ] Zaglavlje - Marikomerc proizvodnja, datum
+		- [ ] Sadržaj
+		- [ ] Prva stranica 
+			- [ ] Uvod, zaključak
+		- [ ] Ostatak
+			- [ ] Grafovi i 
+	- [ ] Prikaz grafova 
+	- [ ] Prikaz teksta
+	- [ ] Zaključci
+- [ ] Error Handling 
