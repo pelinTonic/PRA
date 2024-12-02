@@ -1,35 +1,34 @@
 from docx import Document
 from docx.shared import Inches
-from functions import *
 import os
+import pandas as pd
 from docx.enum.section import WD_ORIENTATION
+import datetime 
 
-def create_document(folder_path, output_file):
+def create_document(dictionary: dict):
+
     document = Document()
+    document.add_heading(f"Izvještaj prosjeka čišćenja {datetime.datetime.now()}")
+    
+    for key, value in dictionary.items():
+        if isinstance(value, pd.Series):
+            value = value.to_frame(name="Values").reset_index()
+    # Add a heading for each table
+        document.add_heading(key, level=2)
 
-    document.add_heading("Prosjeci čišćenja", 0)
-    section = document.sections[0]
-    section.orientation = WD_ORIENTATION.PORTRAIT
-    section.page_width = Inches(8.3)
-    section.page_height= Inches(11.7)
+    # Add a table for the DataFrame
+        table = document.add_table(rows=1, cols=len(value.columns))
+        table.style = 'Table Grid'
 
-    document.add_section()
+    # Add the header row
+        hdr_cells = table.rows[0].cells
+        for i, column_name in enumerate(value.columns):
+            hdr_cells[i].text = column_name
 
-    section = document.sections[1]
-    section.orientation = WD_ORIENTATION.LANDSCAPE
-    section.page_width = Inches(11.7)
-    section.page_height = Inches(8.3)
-    section.left_margin = Inches(1)
-    section.right_margin = Inches(1)
-    section.top_margin = Inches(0.33)
-    section.bottom_margin = Inches(1)
+    # Add the data rows
+        for _, row in value.iterrows():
+            row_cells = table.add_row().cells
+            for i, item in enumerate(row):
+                row_cells[i].text = str(item)
 
-    files = os.listdir(folder_path)
-    for file_name in files:
-        file_path = os.path.join(folder_path, file_name)
-        print(file_path)
-        if os.path.isfile(file_path):
-            document.add_heading(file_name, level = 1)
-            document.add_picture(file_path, width = Inches(9.42),height = Inches(7.7))
-
-    document.save(f"{output_file}.docx")
+    document.save("test.docx")

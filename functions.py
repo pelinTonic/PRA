@@ -1,5 +1,6 @@
 import pandas as pd
 from DB_manager import *
+from report_generation import create_document
 
 def excel_to_dateframe(path_to_excel: str, sort: str = None) -> pd.DataFrame: 
     """   This function reads an Excel file and converts into a pandas DataFrame. 
@@ -134,29 +135,38 @@ def filter_material(df: pd.DataFrame, material: str) -> pd.DataFrame:
 
     return searched_material
 
-def worker_speed_best_average(df: pd.DataFrame, material: str) ->pd.DataFrame:
-
+def worker_speed_best_average(df: pd.DataFrame) ->pd.DataFrame:
     """
-    Filters the DataFrame for the specified material, calculates the average speed per person,
-    and returns the workers' average speeds.
-
-    This function uses `filter_material` to filter the data by the given material, and then 
-    calls `averages_per_person` to calculate and return the average speeds for workers who 
-    processed that material.
+    Calculates and returns a DataFrame containing the average performance metrics 
+    for workers based on the specific material they process. The function processes 
+    the input DataFrame by filtering for unique materials, computing per-person 
+    averages for each material, and combining the results.
 
     Args:
-        df (pd.DataFrame): The DataFrame containing the data, with columns including "Sirovina", "Ime", and "Brzina".
-        material (str): The material to filter the DataFrame by (column "Sirovina").
+        df (pd.DataFrame): A pandas DataFrame containing data about workers and 
+        their performance metrics. The DataFrame is expected to have a column 
+        named "Sirovina" that indicates the type of material processed.
 
     Returns:
-        pd.DataFrame: A DataFrame containing the average speeds per person for the specified material.
+        pd.DataFrame: A DataFrame containing the average performance metrics 
+        for workers, grouped by material type. The output is a concatenation of 
+        individual material-wise results.
     """
-    
-    searched_material = filter_material(df, material)
+   
+    materials = unique_values(df, "Sirovina")
+    results = [] 
 
-    return averages_per_person(searched_material)
+    for material in materials:
+
+        searched_material = filter_material(df, material)
+        result = averages_per_person(searched_material)
+        results.append(result)
+    
+    final_result = pd.concat(results)
+    return final_result
     
 def worker_speed_best_all_time(df: pd.DataFrame) -> dict:
+    #Trebala bi vratit samo najboljeg radnika po prosjeku u jednom procesu
     """  Finds the best worker speeds for each material.
 
     This function takes a DataFrame containing worker speed data and returns a dictionary 
@@ -231,17 +241,20 @@ def pull_data_from_database(table_name: str):
 def generate_report(checkbox1_state, checkbox2_state, checkbox3_state, checkbox4_state, checkbox5_state, checkbox6_state):
     
     data = pull_data_from_database("Brzina_Radnika")
-    
+    data_dict = {}
+
     if checkbox1_state == 1:
-        print(averages_per_person(data))
+        data_dict["Prosjek po osobi"] = averages_per_person(data)
     if checkbox2_state == 1:
-        print(averages_per_process(data))
+        data_dict["Prosjek po procesu"] = averages_per_process(data)
     if checkbox3_state == 1:
         print("3")
     if checkbox4_state == 1:
         print("4")
     if checkbox5_state == 1:
-        print(worker_speed_best_average(data))
+        data_dict["Prosječna brzina svakog radnika"] = worker_speed_best_average(data)
     if checkbox6_state == 1:
         print("6")
+    
+    create_document(data_dict)
   
