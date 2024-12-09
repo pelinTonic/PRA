@@ -111,7 +111,7 @@ def averages_per_person(df: pd.DataFrame) -> dict:
     'Ime' and 'Sirovina'.
     """
     df_grouped = df.groupby(['Ime', 'Sirovina'])['Brzina'].mean().round(2)
-    return df_grouped
+    return df_grouped.reset_index()
 
 def filter_material(df: pd.DataFrame, material: str) -> pd.DataFrame:
 
@@ -135,35 +135,6 @@ def filter_material(df: pd.DataFrame, material: str) -> pd.DataFrame:
 
     return searched_material
 
-def worker_speed_best_average(df: pd.DataFrame) ->pd.DataFrame:
-    """
-    Calculates and returns a DataFrame containing the average performance metrics 
-    for workers based on the specific material they process. The function processes 
-    the input DataFrame by filtering for unique materials, computing per-person 
-    averages for each material, and combining the results.
-
-    Args:
-        df (pd.DataFrame): A pandas DataFrame containing data about workers and 
-        their performance metrics. The DataFrame is expected to have a column 
-        named "Sirovina" that indicates the type of material processed.
-
-    Returns:
-        pd.DataFrame: A DataFrame containing the average performance metrics 
-        for workers, grouped by material type. The output is a concatenation of 
-        individual material-wise results.
-    """
-   
-    materials = unique_values(df, "Sirovina")
-    results = [] 
-
-    for material in materials:
-
-        searched_material = filter_material(df, material)
-        result = averages_per_person(searched_material)
-        results.append(result)
-    
-    final_result = pd.concat(results)
-    return final_result
     
 def worker_speed_best_all_time(df: pd.DataFrame) -> dict:
     #Trebala bi vratit samo najboljeg radnika po prosjeku u jednom procesu
@@ -205,14 +176,6 @@ def add_data_to_database(df: pd.DataFrame):
     """
 
     database = create_connection("baza_proizvodnja.db")
-    # create_table_query = """CREATE TABLE Brzina_Radnika (
-    #     Date TEXT,
-    #     Name TEXT,
-    #     Speed REAL,
-    #     Raw material TEXT
-    # )"""
-
-    #create_table(database, create_table_query)
     df.to_sql("Brzina_Radnika", database, if_exists="replace", index=False)
 
 
@@ -236,7 +199,65 @@ def pull_data_from_database(table_name: str):
     
     return dataframe
 
+def calculate_difference(df:pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculates the difference between the worker-specific average speed 
+    and the process-specific average speed for each material ("Sirovina"). 
 
+    The function computes the absolute difference and percentage difference 
+    between the speeds, renames relevant columns, and returns a DataFrame 
+    with the calculated metrics.
+
+    Args:
+        df (pd.DataFrame): A pandas DataFrame containing production data, 
+        including columns required to compute averages per person and process.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the following columns:
+            - "Ime": Name of the worker.
+            - "Sirovina": The raw material being processed.
+            - "Prosječna brzina": Average speed for the process.
+            - "Brzina": Speed achieved by the worker.
+            - "Difference": The difference between the worker's speed and the process average.
+            - "Difference %": The percentage difference relative to the worker's speed.
+    """
+    process_average = averages_per_process(df)
+    worker_average = averages_per_person(df)
+    
+
+    merged_df = pd.merge(worker_average, process_average, on="Sirovina")
+    merged_df['Difference'] = (merged_df['Brzina_x'] - merged_df['Brzina_y']).round(2)
+    merged_df["Difference %"] = ((merged_df["Difference"]/merged_df["Brzina_y"])*100).round(2)
+    merged_df = merged_df.rename(columns={"Brzina_x": "Brzina" ,"Brzina_y": "Prosječna brzina"})
+    result_df = merged_df[['Ime', 'Sirovina', "Prosječna brzina","Brzina",'Difference', "Difference %"]]
+    
+    return result_df
+            
+
+def standard_deviation_per_process(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculate the standard deviation of the "Brzina" column for each unique value in the "Sirovina" column.
+
+    This function groups the input DataFrame by the "Sirovina" column and computes the standard deviation 
+    of the "Brzina" column within each group. It is useful for analyzing variability in "Brzina" values 
+    across different "Sirovina" categories.
+
+    Args:
+        df (pd.DataFrame): A pandas DataFrame containing at least two columns:
+            - "Sirovina": The column used for grouping.
+            - "Brzina": The column for which the standard deviation is computed.
+
+    Returns:
+        pd.Series: A pandas Series where the index corresponds to the unique values in the "Sirovina" column,
+        and the values are the standard deviations of the "Brzina" column within each group.
+    """
+    return df.groupby("Sirovina")["Brzina"].std()
+
+def sort_workers(df: pd.DataFrame, ascending: bool) -> pd.DataFrame:
+    df_average = averages_per_person(df)
+    process_dfs = {process: group.sort_values(by="Brzina", ascending=ascending) for process, group in df_average.groupby("Sirovina")}    
+    
+    return process_dfs
 
 def generate_report(checkbox1_state, checkbox2_state, checkbox3_state, checkbox4_state, checkbox5_state, checkbox6_state):
     
@@ -248,13 +269,22 @@ def generate_report(checkbox1_state, checkbox2_state, checkbox3_state, checkbox4
     if checkbox2_state == 1:
         data_dict["Prosjek po procesu"] = averages_per_process(data)
     if checkbox3_state == 1:
-        print("3")
+        data_dict["Odstupanje radnika od prosjeka"] = calculate_difference(data)
     if checkbox4_state == 1:
-        print("4")
+        data_dict["Standardna devijacija po procesu"] = standard_deviation_per_process(data)
     if checkbox5_state == 1:
-        data_dict["Prosječna brzina svakog radnika"] = worker_speed_best_average(data)
+       process_dict =  sort_workers(data, False)
+
+       for process, process_df in process_dict.items():
+           data_dict[f"{process}"] = process_df[["Ime", "Sirovina", "Brzina"]]
+
     if checkbox6_state == 1:
-        print("6")
-    
+
+        process_dict =  sort_workers(data, True)
+
+        for process, process_df in process_dict.items():
+           data_dict[f"{process}"] = process_df[["Ime", "Sirovina", "Brzina"]]
+
     create_document(data_dict)
+    
   

@@ -70,7 +70,6 @@ def show_main_screen(root: ctk.ctk_tk):
     select_file_button = ctk.CTkButton(main_frame, text="Select file", command=lambda: select_file(file_path_entry, root))
     select_file_button.grid(row = 0, column = 1, padx = 5, pady = 5)
 
-
 def app():
 
     root = ctk.CTk()

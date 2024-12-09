@@ -8,16 +8,18 @@
 		- [ ] Preview podataka
 	
 	- [ ] Mogućnost izbora vrste izvještaja i stavki u izvještaju
-		- [ ] Checkbox pomoću kojih se određuje što će pisati u izvještaju
+		- [x] Checkbox pomoću kojih se određuje što će pisati u izvještaju
 		- [ ] Vrste izvještaja
 			- [ ] Usporedba osoba
-				- [ ] Najbolji radnici 
-				- [ ] Najgori radnici
-				- [ ] Standardna devijacija
+    			- [ ] Razdvojiti aktivne i neaktivne radnike
+				- [x] Najbolji radnici 
+				- [x] Najgori radnici
+				- [x] Standardna devijacija
 			- [ ] Usporedba procesa 
 				- [ ] Potrošeni radni sati
 				- [ ] Dobivene količine
 			- [ ] Usporedba razdoblja
+    			- [ ] Kalendar
 			- [ ] Koliko je puta neki radnik bio na određenom procesu
 - [ ] Obrada podataka
 	- [ ] Obrađuje i uređuje podatke iz excel file-a
@@ -28,7 +30,7 @@
 			- [ ] Mogućnost pristupa spremljenim podatcima
 		- [ ] Prosjeci po mjesecima
 		- [x] Prosjeci po radniku
-		- [ ] Prosjeci po procesu
+		- [x] Prosjeci po procesu
 		- [ ] Napredak radnika
 		- [ ] Generiranje grafova i tablica
 - [ ] Generiranje izvještaja
