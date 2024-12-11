@@ -45,7 +45,7 @@ def unique_values(dataframe: pd.DataFrame, column_name: str) -> pd.DataFrame:
     """
     unique_values = dataframe[column_name].unique()
 
-    return unique_values
+    return pd.DataFrame(unique_values, columns=[column_name])
 
 def filter_value(dataframe: pd.DataFrame, column_name: str) -> dict:
     """    This function filters a DataFrame based on unique values of a specified column. 
@@ -134,10 +134,9 @@ def filter_material(df: pd.DataFrame, material: str) -> pd.DataFrame:
     searched_material = df[df["Sirovina"] == material]
 
     return searched_material
-
-    
+ 
 def worker_speed_best_all_time(df: pd.DataFrame) -> dict:
-    #Trebala bi vratit samo najboljeg radnika po prosjeku u jednom procesu
+    
     """  Finds the best worker speeds for each material.
 
     This function takes a DataFrame containing worker speed data and returns a dictionary 
@@ -177,7 +176,6 @@ def add_data_to_database(df: pd.DataFrame):
 
     database = create_connection("baza_proizvodnja.db")
     df.to_sql("Brzina_Radnika", database, if_exists="replace", index=False)
-
 
 def pull_data_from_database(table_name: str):
 
@@ -259,7 +257,7 @@ def sort_workers(df: pd.DataFrame, ascending: bool) -> pd.DataFrame:
     
     return process_dfs
 
-def generate_report(checkbox1_state, checkbox2_state, checkbox3_state, checkbox4_state, checkbox5_state, checkbox6_state):
+def generate_report(checkbox1_state: int, checkbox2_state: int, checkbox3_state: int, checkbox4_state: int, checkbox5_state: int, checkbox6_state: int):
     
     data = pull_data_from_database("Brzina_Radnika")
     data_dict = {}
@@ -276,14 +274,14 @@ def generate_report(checkbox1_state, checkbox2_state, checkbox3_state, checkbox4
        process_dict =  sort_workers(data, False)
 
        for process, process_df in process_dict.items():
-           data_dict[f"{process}"] = process_df[["Ime", "Sirovina", "Brzina"]]
+           data_dict[f"{process} - najbrži"] = process_df[["Ime", "Sirovina", "Brzina"]]
 
     if checkbox6_state == 1:
 
         process_dict =  sort_workers(data, True)
 
         for process, process_df in process_dict.items():
-           data_dict[f"{process}"] = process_df[["Ime", "Sirovina", "Brzina"]]
+           data_dict[f"{process} - najsporiji"] = process_df[["Ime", "Sirovina", "Brzina"]]
 
     create_document(data_dict)
     

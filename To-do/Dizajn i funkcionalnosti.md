@@ -12,6 +12,9 @@
 		- [ ] Vrste izvještaja
 			- [ ] Usporedba osoba
     			- [ ] Razdvojiti aktivne i neaktivne radnike
+        			- [ ] Iz baze podataka povlači sva imena
+        			- [ ] Izvlači jedinstvene vrijednosti
+        			- [ ] Generira checkboxe
 				- [x] Najbolji radnici 
 				- [x] Najgori radnici
 				- [x] Standardna devijacija
