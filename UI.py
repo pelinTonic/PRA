@@ -1,14 +1,32 @@
 import customtkinter as ctk
-from functions import excel_to_dateframe, generate_report, pull_data_from_database, unique_values
+from functions import excel_to_dateframe, generate_report,add_data_to_database, pull_data_from_database, unique_values
 from customtkinter import filedialog
 from error import error
 import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
-import os 
-def save_selected_workers():
-    pass
-def reset_selected_workers():
-    pass
+import os
+import pandas as pd
+
+def save_selected_workers(checkboxes: list):
+    
+    dataframe = []
+    
+    for checkbox in checkboxes:
+        
+        if checkbox.get() == 1:
+            text = checkbox.cget("text")
+            dataframe.append(text)
+        else:
+            pass
+    dataframe = pd.DataFrame(dataframe)
+    add_data_to_database(dataframe, "Radnici")
+            
+
+def reset_selected_workers(checkboxes: list):
+
+    for checkbox in checkboxes:
+        checkbox.deselect()
+
 
 def worker_selection_screen(root_workers):
 
@@ -21,14 +39,17 @@ def worker_selection_screen(root_workers):
     data = pull_data_from_database("Brzina_Radnika")
     worker_names = unique_values(data, "Ime")
     
+    checkboxes = []
+
     for index, worker in worker_names.itertuples():
         checkbox = ctk.CTkCheckBox(checkbox_frame, text = worker, width=300, onvalue=1, offvalue=0)
         checkbox.grid(row = index , column = 0, padx = 5, pady = 5)
+        checkboxes.append(checkbox)
 
-    save_button = ctk.CTkButton(button_frame, text="Save selection", command=lambda: save_selected_workers())
+    save_button = ctk.CTkButton(button_frame, text="Save selection", command=lambda: save_selected_workers(checkboxes))
     save_button.grid(row = 0, column = 0, padx = 5, pady = 5)
 
-    reset_button = ctk.CTkButton(button_frame, text="Reset Selection", command=lambda: reset_selected_workers())
+    reset_button = ctk.CTkButton(button_frame, text="Reset Selection", command=lambda: reset_selected_workers(checkboxes))
     reset_button.grid(row = 0, column = 1, padx = 5, pady = 5)
    
 

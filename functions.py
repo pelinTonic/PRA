@@ -18,7 +18,7 @@ def excel_to_dateframe(path_to_excel: str, sort: str = None) -> pd.DataFrame:
     if sort is not None:
         dataframe = dataframe.sort_values(by=sort)
         
-    add_data_to_database(dataframe)
+    add_data_to_database(dataframe, "Brzina_Radnika")
     return dataframe
 
 def get_column_names(dataframe: pd.DataFrame) -> list:
@@ -163,7 +163,7 @@ def worker_speed_best_all_time(df: pd.DataFrame) -> dict:
 
     return result
 
-def add_data_to_database(df: pd.DataFrame):
+def add_data_to_database(df: pd.DataFrame, table_name):
     """Creates a table and inserts DataFrame data into an SQLite database.
 
     Args:
@@ -175,7 +175,7 @@ def add_data_to_database(df: pd.DataFrame):
     """
 
     database = create_connection("baza_proizvodnja.db")
-    df.to_sql("Brzina_Radnika", database, if_exists="replace", index=False)
+    df.to_sql(f"{table_name}", database, if_exists="replace", index=False)
 
 def pull_data_from_database(table_name: str):
 
@@ -231,7 +231,6 @@ def calculate_difference(df:pd.DataFrame) -> pd.DataFrame:
     
     return result_df
             
-
 def standard_deviation_per_process(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate the standard deviation of the "Brzina" column for each unique value in the "Sirovina" column.
