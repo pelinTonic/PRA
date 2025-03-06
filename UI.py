@@ -6,6 +6,7 @@ import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
 import os
 import pandas as pd
+from DB_manager import remove_table
 
 def save_selected_workers(checkboxes: list):
     
@@ -21,42 +22,51 @@ def save_selected_workers(checkboxes: list):
     dataframe = pd.DataFrame(dataframe)
     add_data_to_database(dataframe, "Radnici")
             
-
 def reset_selected_workers(checkboxes: list):
 
     for checkbox in checkboxes:
         checkbox.deselect()
+        
+def check_all_workers(checkboxes):
+    for var in checkboxes:
+        var.toggle()
 
-
-def worker_selection_screen(root_workers):
-
+def worker_selection_screen(root_workers, data):
+   
+    worker_names = unique_values(data, "Ime")
     checkbox_frame = ctk.CTkScrollableFrame(master=root_workers)
     checkbox_frame.pack(padx = 5, pady = 5)
 
     button_frame = ctk.CTkFrame(master=root_workers)
     button_frame.pack(padx = 5, pady = 5)
 
-    data = pull_data_from_database("Brzina_Radnika")
-    worker_names = unique_values(data, "Ime")
-    
     checkboxes = []
 
     for index, worker in worker_names.itertuples():
-        checkbox = ctk.CTkCheckBox(checkbox_frame, text = worker, width=300, onvalue=1, offvalue=0)
+        var = ctk.BooleanVar(value=False) 
+        checkbox = ctk.CTkCheckBox(checkbox_frame, text = worker, width=300, onvalue=1, offvalue=0, variable=var)
         checkbox.grid(row = index , column = 0, padx = 5, pady = 5)
         checkboxes.append(checkbox)
 
     save_button = ctk.CTkButton(button_frame, text="Save selection", command=lambda: save_selected_workers(checkboxes))
     save_button.grid(row = 0, column = 0, padx = 5, pady = 5)
 
+    select_all_worker = ctk.CTkButton(button_frame, text="Select all workers", command=lambda: check_all_workers(checkboxes))
+    select_all_worker.grid(row = 0, column = 1, padx = 5, pady = 5)
+
     reset_button = ctk.CTkButton(button_frame, text="Reset Selection", command=lambda: reset_selected_workers(checkboxes))
-    reset_button.grid(row = 0, column = 1, padx = 5, pady = 5)
-   
+    reset_button.grid(row = 0, column = 2, padx = 5, pady = 5)
 
 def open_worker_selection_screen():
-    root_workers = ctk.CTk()
-    worker_selection_screen(root_workers)
-    root_workers.mainloop()
+    data = pull_data_from_database("Brzina_Radnika")
+    
+    if data is None:
+        error("Database is not selected")
+    else:
+        root_workers = ctk.CTkToplevel()
+        root_workers.title("Worker list")
+        worker_selection_screen(root_workers, data)
+        root_workers.mainloop()
 
 def select_file(file_path_entry: ctk.CTkEntry, root: ctk.CTk):
 
@@ -130,5 +140,3 @@ def app():
     root = ctk.CTk()
     show_main_screen(root)
     root.mainloop()
-
-app()

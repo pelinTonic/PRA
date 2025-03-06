@@ -173,7 +173,10 @@ def add_data_to_database(df: pd.DataFrame, table_name):
     Returns:
         None
     """
+    if df.empty:
+        info("No data was selected")
 
+    
     database = create_connection("baza_proizvodnja.db")
     df.to_sql(f"{table_name}", database, if_exists="replace", index=False)
 
@@ -188,14 +191,16 @@ def pull_data_from_database(table_name: str):
         pd.DataFrame: A DataFrame containing all rows from the specified table, 
         with columns: "Date", "Name", "Speed", and "Raw material".
     """
+
     database = create_connection("baza_proizvodnja.db")
     pull_query = f"SELECT * FROM {table_name}"
     data = get_all_data(database, pull_query)
-    columns = get_sql_column_names(database, table_name)
-
-    dataframe = pd.DataFrame(data, columns=columns)
-    
-    return dataframe
+    if data:
+        columns = get_sql_column_names(database, table_name)
+        dataframe = pd.DataFrame(data, columns=columns)
+        return dataframe
+    else:
+        return None
 
 def calculate_difference(df:pd.DataFrame) -> pd.DataFrame:
     """

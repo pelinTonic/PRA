@@ -71,7 +71,6 @@ def insert_into_table(
         error(error_msg)
         return False
     
-
 def get_all_data(
     sql_connection: sqlite3.Connection, 
     search_sql: str,
@@ -90,7 +89,6 @@ def get_all_data(
     except sqlite3.Error as error_msg:
         error(error_msg)
         return False
-
 
 def get_column(connection: sqlite3.Connection, table_name:str, column_name:str) -> list:
 
@@ -116,3 +114,13 @@ def get_sql_column_names(connection: sqlite3.Connection, table_name: str):
     connection.close()
     
     return column_names
+
+def remove_table(connection: sqlite3.Connection, table_name:str):
+
+    cursor = connection.cursor()
+    cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+    connection.commit()
+    connection.close()
+    
+
+

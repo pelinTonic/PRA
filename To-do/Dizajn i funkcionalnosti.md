@@ -24,6 +24,7 @@
 			- [ ] Usporedba razdoblja
     			- [ ] Kalendar
 			- [ ] Koliko je puta neki radnik bio na određenom procesu
+  
 - [ ] Obrada podataka
 	- [ ] Obrađuje i uređuje podatke iz excel file-a
 		- [ ] Mogućnost editanja Excel file-a
@@ -36,6 +37,7 @@
 		- [x] Prosjeci po procesu
 		- [ ] Napredak radnika
 		- [ ] Generiranje grafova i tablica
+            - [ ] Usporedba radnika s prosijekom
 - [ ] Generiranje izvještaja
 	- [ ] Na osnovu podataka generira se standardizirani izvještaj
 		- [ ] Zaglavlje - Marikomerc proizvodnja, datum
